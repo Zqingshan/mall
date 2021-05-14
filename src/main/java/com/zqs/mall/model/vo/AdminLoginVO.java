@@ -32,4 +32,5 @@ public class AdminLoginVO {
         this.token = token;
         this.name = name;
     }
+
 }

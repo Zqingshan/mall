@@ -1,15 +1,24 @@
 package com.zqs.mall.model;
 
+import java.io.Serializable;
+
 /**
- * @description: admin数据库实体
- * @author: z_qingshan
- * @create: 2021-05-14
- **/
-public class Admin {
+ * (Admin)实体类
+ *
+ * @author makejava
+ * @since 2021-05-14 18:55:34
+ */
+public class Admin implements Serializable {
+    // private static final long serialVersionUID = 180638179283312905L;
+    
     private Integer id;
+    
     private String username;
+    
     private String nickname;
+    
     private String password;
+
 
     public Integer getId() {
         return id;

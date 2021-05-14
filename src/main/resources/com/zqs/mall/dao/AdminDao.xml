@@ -1,10 +1,39 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zqs.mall.dao.AdminDao">
-    <select id="login" resultType="int" parameterType="com.zqs.mall.model.Admin">
-        select count(*)
+    <select id="queryAdminByUsername" resultType="com.zqs.mall.model.Admin" parameterType="com.zqs.mall.model.Admin">
+        select password
         from db_mall.admin
         where username = #{username}
-          and password = #{password}
     </select>
+
+    <select id="queryAllAdmins" resultType="com.zqs.mall.model.Admin">
+        select *
+        from db_mall.admin
+    </select>
+
+    <insert id="insertAdmin" parameterType="com.zqs.mall.model.Admin">
+        insert into db_mall.admin
+        values (null, #{username}, #{nickname}, #{password})
+    </insert>
+
+    <delete id="deleteAdminById" parameterType="integer">
+        delete
+        from db_mall.admin
+        where id = #{id}
+    </delete>
+
+    <select id="queryAdminById" resultType="com.zqs.mall.model.Admin">
+        select *
+        from db_mall.admin
+        where id = #{id}
+    </select>
+
+    <update id="updateAdmin" parameterType="com.zqs.mall.model.Admin">
+        update db_mall.admin
+        set username=#{username},
+            nickname=#{nickname},
+            password=#{password}
+    </update>
 </mapper>

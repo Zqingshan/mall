@@ -1,7 +1,7 @@
 package com.zqs.mall.model.bo;
 
 /**
- * @description: admin登录请求报文的请求体参数
+ * @description:
  * @author: z_qingshan
  * @create: 2021-05-14
  **/
@@ -25,11 +25,11 @@ public class AdminLoginBO {
         this.pwd = pwd;
     }
 
-    @Override
-    public String toString() {
-        return "AdminLoginBO{" +
-                "email='" + email + '\'' +
-                ", pwd='" + pwd + '\'' +
-                '}';
+    public AdminLoginBO() {
+    }
+
+    public AdminLoginBO(String email, String pwd) {
+        this.email = email;
+        this.pwd = pwd;
     }
 }
