@@ -52,4 +52,11 @@ public interface AdminDao {
      * @return
      */
     int updateAdmin(Admin admin);
+
+    /**
+     * 通过username查找nickname
+     * @param userName
+     * @return
+     */
+    Admin queryNickNameByUname(Admin userName);
 }

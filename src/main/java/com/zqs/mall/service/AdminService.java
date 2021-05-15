@@ -1,7 +1,6 @@
 package com.zqs.mall.service;
 
 import com.zqs.mall.model.Admin;
-import com.zqs.mall.model.bo.AdminLoginBO;
 import com.zqs.mall.model.vo.AllAdminVO;
 
 import java.util.List;
@@ -10,6 +9,7 @@ public interface AdminService {
 
     /**
      * 登录功能验证
+     *
      * @param admin
      * @return
      */
@@ -17,6 +17,7 @@ public interface AdminService {
 
     /**
      * 获取所有管理员信息
+     *
      * @param admin
      * @return
      */
@@ -24,13 +25,15 @@ public interface AdminService {
 
     /**
      * 新增管理员
-     * @param adminRequest
+     *
+     * @param admin
      * @return
      */
-    int insertAdmin(AllAdminVO adminRequest);
+    int insertAdmin(Admin admin);
 
     /**
      * 通过id删除管理员
+     *
      * @param id
      * @return
      */
@@ -38,6 +41,7 @@ public interface AdminService {
 
     /**
      * 通过id查找管理员,同修改一起使用
+     *
      * @param id
      * @return
      */
@@ -45,9 +49,18 @@ public interface AdminService {
 
     /**
      * 修改管理员信息
-     * @param adminRequest
+     *
+     * @param admin
      * @return
      */
-    int updateAdmin(AllAdminVO adminRequest);
+    int updateAdmin(Admin admin);
 
+
+    /**
+     * 通过用户名查找昵称
+     *
+     * @param userName
+     * @return
+     */
+    Admin queryNickNameByUname(Admin userName);
 }

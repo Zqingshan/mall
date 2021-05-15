@@ -76,18 +76,45 @@ public class AdminServlet extends HttpServlet {
         if (StringUtils.isEmpty(changePwdBO.getOldPwd())) {
             result = new Result(10000, "原密码不能为空");
             response.getWriter().println(objectMapper.writeValueAsString(result));
+            return;
         } else if (StringUtils.isEmpty(changePwdBO.getNewPwd())) {
             result = new Result(10000, "新密码不能为空");
             response.getWriter().println(objectMapper.writeValueAsString(result));
+            return;
         } else if (StringUtils.isEmpty(changePwdBO.getConfirmPwd())) {
             result = new Result(10000, "确认新密码不能为空");
             response.getWriter().println(objectMapper.writeValueAsString(result));
+            return;
+        } else if (!changePwdBO.getNewPwd().equals(changePwdBO.getConfirmPwd())) {
+            // 新密码与确认密码不一致
+            result = new Result(10000, "请保持确认新密码一致!");
+            response.getWriter().println(objectMapper.writeValueAsString(result));
+            return;
         }
         // 参数校验通过
-        // 先查询原密码是否正确,通过密码查询,返回查询的条数
-        Admin admin = new Admin();
+        // 先查询原密码是否正确,将用户名传入sql,返回密码,最终得到状态码
+        Admin admin = new Admin(null, changePwdBO.getAdminToken(), null, changePwdBO.getNewPwd());
         int code = adminService.login(admin);
-
+        if (code == 200 || code == 403) {
+            // 旧密码正确,并且新密码和旧密码不相等
+            Admin adminPwd = new Admin(null, changePwdBO.getAdminToken(), null, changePwdBO.getNewPwd());
+            int effectRows = adminService.updateAdmin(adminPwd);
+            // TODO
+            if (effectRows == 200) {
+                // 修改成功
+                result = new Result(0);
+            } else {
+                result = new Result(10000, "修改失败");
+            }
+        } else if (code == 404) {
+            // 旧密码错误
+            result = new Result(10000, "旧密码错误!");
+        } else if (code == 405) {
+            // "{"code":10000,"message":"新密码与旧密码相同!"}
+            result = new Result(10000, "新密码与旧密码相同!");
+        }
+        // 返回结果
+        response.getWriter().println(objectMapper.writeValueAsString(result));
     }
 
     /**
@@ -126,7 +153,8 @@ public class AdminServlet extends HttpServlet {
         String requestBody = HttpUtils.parseRequestBody(request);
         // 字符串转成javabean
         AllAdminVO adminRequest = objectMapper.readValue(requestBody, AllAdminVO.class);
-        int effectRows = adminService.updateAdmin(adminRequest);
+        Admin admin = new Admin(adminRequest.getId(), adminRequest.getEmail(), adminRequest.getNickname(), adminRequest.getPwd());
+        int effectRows = adminService.updateAdmin(admin);
         if (effectRows == 200) {
             // 修改成功
             result = new Result(0);
@@ -147,7 +175,8 @@ public class AdminServlet extends HttpServlet {
         String requestBody = HttpUtils.parseRequestBody(request);
         // 字符串转成javabean
         AllAdminVO adminRequest = objectMapper.readValue(requestBody, AllAdminVO.class);
-        int effectRows = adminService.insertAdmin(adminRequest);
+        Admin admin = new Admin(adminRequest.getId(), adminRequest.getEmail(), adminRequest.getNickname(), adminRequest.getPwd());
+        int effectRows = adminService.insertAdmin(admin);
         if (effectRows == 200) {
             // 添加成功 {"code":0}
             result = new Result(0);
@@ -186,9 +215,12 @@ public class AdminServlet extends HttpServlet {
         } else if (code == 403) {
             // 账号存在,密码不相等  {"code":10000,"message":"密码不正确!"}
             result = new Result(10000, "密码不正确");
-        } else {
+        } else if (code == 200 || code == 405) {
             // 账号密码正确,登录成功   {"code":0,"data":{"token":"admin","name":"admin"}}
-            AdminLoginVO loginVO = new AdminLoginVO(adminLoginBO.getEmail(), adminLoginBO.getEmail());
+            // 获取昵称
+            Admin userName = new Admin(null, adminLoginBO.getEmail(), null, null);
+            Admin nickName = adminService.queryNickNameByUname(userName);
+            AdminLoginVO loginVO = new AdminLoginVO(nickName.getNickname(), nickName.getNickname());
             result = new Result(0, loginVO);
         }
         response.getWriter().println(objectMapper.writeValueAsString(result));

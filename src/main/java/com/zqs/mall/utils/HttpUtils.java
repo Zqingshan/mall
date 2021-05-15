@@ -12,7 +12,7 @@ import java.io.IOException;
  **/
 public class HttpUtils {
     public static String parseRequestBody(HttpServletRequest request) throws IOException {
-        // 获取前端表单输入的请求体参数,再将其转成JavaBean
+        // 获取前端表单输入的请求体参数
         ServletInputStream inputStream = request.getInputStream();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         int length = 0;
