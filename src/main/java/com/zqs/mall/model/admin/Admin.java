@@ -1,4 +1,4 @@
-package com.zqs.mall.model;
+package com.zqs.mall.model.admin;
 
 import java.io.Serializable;
 

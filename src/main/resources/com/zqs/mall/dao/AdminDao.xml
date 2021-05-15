@@ -2,13 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zqs.mall.dao.AdminDao">
-    <select id="queryAdminByUsername" resultType="com.zqs.mall.model.Admin" parameterType="com.zqs.mall.model.Admin">
+    <select id="queryAdminByUsername" resultType="com.zqs.mall.model.admin.Admin" parameterType="com.zqs.mall.model.admin.Admin">
         select password
         from db_mall.admin
         where username = #{username}
     </select>
 
-    <select id="queryAllAdmins" resultType="com.zqs.mall.model.Admin" parameterType="com.zqs.mall.model.Admin">
+    <select id="queryAllAdmins" resultType="com.zqs.mall.model.admin.Admin" parameterType="com.zqs.mall.model.admin.Admin">
         select *
         from db_mall.admin
         <where>
@@ -27,7 +27,7 @@
         </where>
     </select>
 
-    <insert id="insertAdmin" parameterType="com.zqs.mall.model.Admin">
+    <insert id="insertAdmin" parameterType="com.zqs.mall.model.admin.Admin">
         insert into db_mall.admin
         values (null, #{username}, #{nickname}, #{password})
     </insert>
@@ -38,13 +38,13 @@
         where id = #{id}
     </delete>
 
-    <select id="queryAdminById" resultType="com.zqs.mall.model.Admin">
+    <select id="queryAdminById" resultType="com.zqs.mall.model.admin.Admin">
         select *
         from db_mall.admin
         where id = #{id}
     </select>
 
-    <update id="updateAdmin" parameterType="com.zqs.mall.model.Admin">
+    <update id="updateAdmin" parameterType="com.zqs.mall.model.admin.Admin">
         update db_mall.admin
         <set>
             <if test="username != null and username != ''">
@@ -67,7 +67,7 @@
         </where>
     </update>
 
-    <select id="queryNickNameByUname" resultType="com.zqs.mall.model.Admin" parameterType="com.zqs.mall.model.Admin">
+    <select id="queryNickNameByUname" resultType="com.zqs.mall.model.admin.Admin" parameterType="com.zqs.mall.model.admin.Admin">
         select nickname
         from db_mall.admin
         where username = #{username}

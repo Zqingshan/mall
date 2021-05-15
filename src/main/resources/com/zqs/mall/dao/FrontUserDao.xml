@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zqs.mall.dao.FrontUserDao">
+    <select id="queryPwdByUserName" resultType="com.zqs.mall.model.User" parameterType="com.zqs.mall.model.User">
+        select password
+        from db_mall.user
+        where email = #{email}
+    </select>
+
+    <select id="queryNickNameByUname" resultType="com.zqs.mall.model.User" parameterType="com.zqs.mall.model.User">
+        select nickname
+        from db_mall.user
+        where email = #{email}
+    </select>
+
+    <select id="queryUserByEmail" resultType="com.zqs.mall.model.User" parameterType="com.zqs.mall.model.User">
+        select *
+        from db_mall.user
+        where email = #{email}
+    </select>
+
+    <insert id="insertUser" parameterType="com.zqs.mall.model.User">
+        insert into db_mall.user
+        values (null, #{email}, #{nickname}, #{password}, #{receiver}, #{address}, #{telephone})
+    </insert>
+</mapper>

@@ -1,7 +1,7 @@
 package com.zqs.mall.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zqs.mall.model.Admin;
+import com.zqs.mall.model.admin.Admin;
 import com.zqs.mall.model.Result;
 import com.zqs.mall.model.bo.AdminLoginBO;
 import com.zqs.mall.model.bo.ChangePwdBO;
@@ -213,7 +213,7 @@ public class AdminServlet extends HttpServlet {
             // 账号不存在   {"code":10000,"message":"该账号不存在"}
             result = new Result(10000, "该账号不存在");
         } else if (code == 403) {
-            // 账号存在,密码不相等  {"code":10000,"message":"密码不正确!"}
+            // 账号存在,密码不相等
             result = new Result(10000, "密码不正确");
         } else if (code == 200 || code == 405) {
             // 账号密码正确,登录成功   {"code":0,"data":{"token":"admin","name":"admin"}}

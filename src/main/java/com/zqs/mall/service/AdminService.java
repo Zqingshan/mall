@@ -1,6 +1,6 @@
 package com.zqs.mall.service;
 
-import com.zqs.mall.model.Admin;
+import com.zqs.mall.model.admin.Admin;
 import com.zqs.mall.model.vo.AllAdminVO;
 
 import java.util.List;

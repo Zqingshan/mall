@@ -1,7 +1,7 @@
 package com.zqs.mall.service;
 
 import com.zqs.mall.dao.AdminDao;
-import com.zqs.mall.model.Admin;
+import com.zqs.mall.model.admin.Admin;
 import com.zqs.mall.model.vo.AllAdminVO;
 import com.zqs.mall.utils.MyBatisUtils;
 import org.apache.ibatis.session.SqlSession;

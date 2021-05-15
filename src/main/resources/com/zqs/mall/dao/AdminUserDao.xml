@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zqs.mall.dao.AdminUserDao">
+    <select id="queryAllUser" resultType="com.zqs.mall.model.User" parameterType="com.zqs.mall.model.User">
+        select * from db_mall.user
+        <where>
+            <if test="id != null and id != ''">
+                id = #{id}
+            </if>
+            <if test="email != null and id != ''">
+                and email = #{email},
+            </if>
+            <if test="nickname != null and nickname != ''">
+                and nickname like concat("%", #{nickname}, "%")
+            </if>
+            <if test="password != null and password != ''">
+                and password = #{password}
+            </if>
+            <if test="receiver != null and receiver != ''">
+                and receiver = #{receiver}
+            </if>
+            <if test="address != null and address != ''">
+                and address = #{address}
+            </if>
+            <if test="telephone != null and telephone != ''">
+                and telephone = #{telephone}
+            </if>
+        </where>
+    </select>
+
+    <delete id="deleteUserById" parameterType="integer">
+        delete
+        from db_mall.user
+        where id = #{id}
+    </delete>
+
+</mapper>

@@ -1,6 +1,6 @@
 package com.zqs.mall.dao;
 
-import com.zqs.mall.model.Admin;
+import com.zqs.mall.model.admin.Admin;
 
 import java.util.List;
 
