@@ -1,21 +1,23 @@
 package com.zqs.mall.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zqs.mall.model.Admin;
 import com.zqs.mall.model.Result;
 import com.zqs.mall.model.bo.AdminLoginBO;
+import com.zqs.mall.model.bo.ChangePwdBO;
+import com.zqs.mall.model.bo.SearchAdminBO;
 import com.zqs.mall.model.vo.AdminLoginVO;
 import com.zqs.mall.model.vo.AllAdminVO;
 import com.zqs.mall.service.AdminService;
 import com.zqs.mall.service.AdminServiceImpl;
+import com.zqs.mall.utils.HttpUtils;
 import com.zqs.mall.utils.StringUtils;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -26,6 +28,14 @@ public class AdminServlet extends HttpServlet {
     private AdminService adminService = new AdminServiceImpl();
     private Result result = null;
 
+    /**
+     * post请求方法
+     *
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // 获取前端请求
         String uri = request.getRequestURI();
@@ -36,7 +46,71 @@ public class AdminServlet extends HttpServlet {
             addAdminss(request, response);
         } else if ("updateAdminss".equals(replace)) {
             updateAdmin(request, response);
+        } else if ("getSearchAdmins".equals(replace)) {
+            // POST http://115.29.141.32:8084/api/admin/getSearchAdmins HTTP/1.1
+            getSearchAdmins(request, response);
+        } else if ("changePwd".equals(replace)) {
+            // POST http://115.29.141.32:8084/api/admin/changePwd HTTP/1.1
+            changePwd(request, response);
         }
+    }
+
+    /**
+     * 修改密码
+     * 请求参数 "{"adminToken":"zqs66666","oldPwd":"Zqs666666!","newPwd":"Zqs777777!","confirmPwd":"Zqs777777!"}
+     * 修改成功 响应体 "{"code":0}"
+     * 旧密码错误 "{"code":10000,"message":"旧密码错误!"}
+     * 新密码与确认密码不一致 "{"code":10000,"message":"请保持确认新密码一致!"}
+     * 可添加 新密码与旧密码相同 "{"code":10000,"message":"新密码与旧密码相同!"}
+     *
+     * @param request
+     * @param response
+     */
+    private void changePwd(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // 接收参数
+        String requestBody = HttpUtils.parseRequestBody(request);
+        // json转成JavaBean
+        ChangePwdBO changePwdBO = objectMapper.readValue(requestBody, ChangePwdBO.class);
+
+        // 参数校验  原密码,新密码,确认新密码不能为空
+        if (StringUtils.isEmpty(changePwdBO.getOldPwd())) {
+            result = new Result(10000, "原密码不能为空");
+            response.getWriter().println(objectMapper.writeValueAsString(result));
+        } else if (StringUtils.isEmpty(changePwdBO.getNewPwd())) {
+            result = new Result(10000, "新密码不能为空");
+            response.getWriter().println(objectMapper.writeValueAsString(result));
+        } else if (StringUtils.isEmpty(changePwdBO.getConfirmPwd())) {
+            result = new Result(10000, "确认新密码不能为空");
+            response.getWriter().println(objectMapper.writeValueAsString(result));
+        }
+        // 参数校验通过
+        // 先查询原密码是否正确,通过密码查询,返回查询的条数
+        Admin admin = new Admin();
+        int code = adminService.login(admin);
+    }
+
+    /**
+     * 多条件查询
+     *
+     * @param request
+     * @param response
+     */
+    private void getSearchAdmins(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // 请求参数 {"nickname":"1","email":"2"}
+        String requestBody = HttpUtils.parseRequestBody(request);
+        // json字符串转成JavaBean
+        SearchAdminBO searchAdminBO = objectMapper.readValue(requestBody, SearchAdminBO.class);
+        Admin admin = new Admin(null, searchAdminBO.getEmail(), searchAdminBO.getNickname(), null);
+        List<AllAdminVO> adminVOList = adminService.allAdmins(admin);
+        if (adminVOList != null) {
+            // 查到数据 {"code":0,"data":[{"id":1,"email":"admin","nickname":"admin","pwd":"admin"}]}
+            // 转成json
+            result = new Result(0, adminVOList);
+        } else {
+            // 没有数据 {"code":0,"data":[]}
+            result = new Result(0);
+        }
+        response.getWriter().println(objectMapper.writeValueAsString(result));
     }
 
     /**
@@ -46,17 +120,9 @@ public class AdminServlet extends HttpServlet {
      * @param response
      */
     private void updateAdmin(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // 请求 POST http://115.29.141.32:8084/api/admin/updateAdminss HTTP/1.1
         // 请求参数 {"id":136,"nickname":"65a4654ad64","email":"7879789@qq.com","pwd":"aA123123!111"}
         // 响应 {"code":0}
-        ServletInputStream inputStream = request.getInputStream();
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        int length = 0;
-        byte[] bytes = new byte[1024];
-        while ((length = inputStream.read(bytes)) != -1) {
-            outputStream.write(bytes, 0, length);
-        }
-        String requestBody = outputStream.toString("utf-8");
+        String requestBody = HttpUtils.parseRequestBody(request);
         // 字符串转成javabean
         AllAdminVO adminRequest = objectMapper.readValue(requestBody, AllAdminVO.class);
         int effectRows = adminService.updateAdmin(adminRequest);
@@ -77,14 +143,7 @@ public class AdminServlet extends HttpServlet {
      * @param response
      */
     private void addAdminss(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        ServletInputStream inputStream = request.getInputStream();
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        int length = 0;
-        byte[] bytes = new byte[1024];
-        while ((length = inputStream.read(bytes)) != -1) {
-            outputStream.write(bytes, 0, length);
-        }
-        String requestBody = outputStream.toString("utf-8");
+        String requestBody = HttpUtils.parseRequestBody(request);
         // 字符串转成javabean
         AllAdminVO adminRequest = objectMapper.readValue(requestBody, AllAdminVO.class);
         int effectRows = adminService.insertAdmin(adminRequest);
@@ -105,18 +164,8 @@ public class AdminServlet extends HttpServlet {
      * @param response
      */
     private void login(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // 获取前端表单输入的请求体参数,再将其转成JavaBean
-        ServletInputStream inputStream = request.getInputStream();
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        int length = 0;
-        byte[] bytes = new byte[1024];
-        while ((length = inputStream.read(bytes)) != -1) {
-            outputStream.write(bytes, 0, length);
-        }
-        // 将OutputStream转成字符串
-        String requestBody = outputStream.toString("utf-8");
+        String requestBody = HttpUtils.parseRequestBody(request);
         AdminLoginBO adminLoginBO = objectMapper.readValue(requestBody, AdminLoginBO.class);
-
 
         // 参数校验   用户名或者密码是否为空
         // 为空
@@ -128,7 +177,8 @@ public class AdminServlet extends HttpServlet {
         }
         // 不为空
         // 调用service层
-        int code = adminService.login(adminLoginBO);
+        Admin admin = new Admin(null, adminLoginBO.getEmail(), null, adminLoginBO.getPwd());
+        int code = adminService.login(admin);
         if (code == 404) {
             // 账号不存在   {"code":10000,"message":"该账号不存在"}
             result = new Result(10000, "该账号不存在");
@@ -143,6 +193,14 @@ public class AdminServlet extends HttpServlet {
         response.getWriter().println(objectMapper.writeValueAsString(result));
     }
 
+    /**
+     * get请求方法
+     *
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // 获取前端请求
         String uri = request.getRequestURI();
@@ -157,7 +215,7 @@ public class AdminServlet extends HttpServlet {
     }
 
     /**
-     * 获取管理员信息
+     * 通过id获取管理员信息
      * // GET http://115.29.141.32:8084/api/admin/getAdminsInfo?id=14
      * // "{"code":0,"data":{"id":1,"email":"admin","nickname":"admin","pwd":"admin"}}"
      *
@@ -206,7 +264,8 @@ public class AdminServlet extends HttpServlet {
      * @param response
      */
     private void allAdmins(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        List<AllAdminVO> allAdminVOS = adminService.allAdmins();
+        Admin admin = new Admin();
+        List<AllAdminVO> allAdminVOS = adminService.allAdmins(admin);
         // 转成json
         Result result = new Result(0, allAdminVOS);
         response.getWriter().println(objectMapper.writeValueAsString(result));

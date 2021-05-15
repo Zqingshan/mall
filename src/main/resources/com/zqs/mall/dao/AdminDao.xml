@@ -8,9 +8,23 @@
         where username = #{username}
     </select>
 
-    <select id="queryAllAdmins" resultType="com.zqs.mall.model.Admin">
+    <select id="queryAllAdmins" resultType="com.zqs.mall.model.Admin" parameterType="com.zqs.mall.model.Admin">
         select *
         from db_mall.admin
+        <where>
+            <if test="id != null and id != ''">
+                id = #{id}
+            </if>
+            <if test="username != null and username != ''">
+                and username like concat("%" , #{username} , "%")
+            </if>
+            <if test="nickname != null and nickname != ''">
+                and nickname like concat("%" , #{nickname} , "%")
+            </if>
+            <if test="password != null and password != ''">
+                and password = #{password}
+            </if>
+        </where>
     </select>
 
     <insert id="insertAdmin" parameterType="com.zqs.mall.model.Admin">
@@ -35,5 +49,6 @@
         set username=#{username},
             nickname=#{nickname},
             password=#{password}
+        where id = #{id}
     </update>
 </mapper>

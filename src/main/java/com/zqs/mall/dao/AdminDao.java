@@ -5,19 +5,51 @@ import com.zqs.mall.model.Admin;
 import java.util.List;
 
 public interface AdminDao {
-    // 管理员登录验证
+    /**
+     * 管理员登录验证
+     *
+     * @param admin
+     * @return
+     */
     Admin queryAdminByUsername(Admin admin);
 
-    // 获取所有管理员信息
-    List<Admin> queryAllAdmins();
+    /**
+     * 获取所有管理员信息
+     *
+     * @return
+     * @param admin
+     */
+    List<Admin> queryAllAdmins(Admin admin);
 
-    // 新增管理员
+    /**
+     * 新增管理员
+     *
+     * @param admin
+     * @return
+     */
     int insertAdmin(Admin admin);
 
-    // 删除管理员
+    /**
+     * 通过id删除管理员
+     *
+     * @param id
+     * @return
+     */
     int deleteAdminById(Integer id);
 
+    /**
+     * 通过id查询管理员信息
+     *
+     * @param id
+     * @return
+     */
     Admin queryAdminById(Integer id);
 
+    /**
+     * 新增管理员
+     *
+     * @param admin
+     * @return
+     */
     int updateAdmin(Admin admin);
 }

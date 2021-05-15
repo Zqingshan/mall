@@ -2,7 +2,6 @@ package com.zqs.mall.service;
 
 import com.zqs.mall.dao.AdminDao;
 import com.zqs.mall.model.Admin;
-import com.zqs.mall.model.bo.AdminLoginBO;
 import com.zqs.mall.model.vo.AllAdminVO;
 import com.zqs.mall.utils.MyBatisUtils;
 import org.apache.ibatis.session.SqlSession;
@@ -20,23 +19,23 @@ public class AdminServiceImpl implements AdminService {
     /**
      * 登录功能
      *
-     * @param adminLoginBO
+     * @param admin
      * @return
      */
     @Override
-    public int login(AdminLoginBO adminLoginBO) {
+    public int login(Admin admin) {
         //调用dao层
         SqlSession sqlSession = MyBatisUtils.openSession();
         AdminDao mapper = sqlSession.getMapper(AdminDao.class);
-        Admin admin = new Admin(null, adminLoginBO.getEmail(), null, null);
-        Admin user = mapper.queryAdminByUsername(admin);
+        Admin adminParam = new Admin(null, admin.getUsername(), null, null);
+        Admin user = mapper.queryAdminByUsername(adminParam);
         sqlSession.commit();
         MyBatisUtils.closeSession(sqlSession);
         if (user == null) {
             // 账号不存在
             return 404;
         }
-        if (!user.getPassword().equals(adminLoginBO.getPwd())) {
+        if (!user.getPassword().equals(admin.getPassword())) {
             // 账号存在,密码不相等
             return 403;
         }
@@ -50,14 +49,14 @@ public class AdminServiceImpl implements AdminService {
      * @return
      */
     @Override
-    public List<AllAdminVO> allAdmins() {
+    public List<AllAdminVO> allAdmins(Admin admin) {
         SqlSession sqlSession = MyBatisUtils.openSession();
         AdminDao mapper = sqlSession.getMapper(AdminDao.class);
-        List<Admin> adminList = mapper.queryAllAdmins();
+        List<Admin> adminList = mapper.queryAllAdmins(admin);
         ArrayList<AllAdminVO> allAdminVOS = new ArrayList<>();
-        for (Admin admin : adminList) {
-            AllAdminVO allAdminVO = new AllAdminVO(admin.getId(), admin.getUsername(), admin.getNickname(), admin.getPassword());
-            allAdminVOS.add(allAdminVO);
+        for (Admin ad : adminList) {
+            AllAdminVO allAdminVOResult = new AllAdminVO(ad.getId(), ad.getUsername(), ad.getNickname(), ad.getPassword());
+            allAdminVOS.add(allAdminVOResult);
         }
         sqlSession.commit();
         MyBatisUtils.closeSession(sqlSession);
@@ -117,7 +116,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     /**
-     * 获取管理员信息
+     * 通过id获取管理员信息
      * 返回对象
      *
      * @param id
@@ -141,7 +140,7 @@ public class AdminServiceImpl implements AdminService {
 
     /**
      * 修改管理员信息
-     *  // 有问题
+     *
      * @param adminRequest
      * @return
      */

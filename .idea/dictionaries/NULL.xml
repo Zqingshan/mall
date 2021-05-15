@@ -2,6 +2,8 @@
   <dictionary name="NULL">
     <words>
       <w>adminss</w>
+      <w>nname</w>
+      <w>uname</w>
     </words>
   </dictionary>
 </component>
